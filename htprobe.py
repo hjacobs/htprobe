@@ -150,10 +150,6 @@ path = sys.argv[2]
 
 dump_probe(p, path)
 
-for r in p.probes:
-    print r.url, r.status_code, r.time_dns, r.time_connect, r.time_request, r.time_response, r.time_total, len(r.response_body)
-
-for link in p.links:
-    print link
-
-print sum([ r.time_total for r in p.probes ])
+print 'Probed {0} urls in {1:.2} seconds with {2} Bytes total size'.format(len(p.probes),
+    sum([ r.time_total for r in p.probes ]),
+    sum([ len(r.response_body) for r in p.probes ]))
