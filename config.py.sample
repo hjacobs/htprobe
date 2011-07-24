@@ -1,0 +1,15 @@
+import re
+from lib.checks import PageCheck, UrlCheck
+from lib.validators import ValidateStatusCode, ValidateTimeTotal
+        
+checks = [
+    PageCheck('Home', '.*example[^/]*/$'),
+    PageCheck('Page1', '.*example[^/]*/page1/$'),
+    UrlCheck('Images', 'jpg$'),
+]
+
+validators = [
+    ValidateStatusCode(),
+    ValidateTimeTotal('.*', 0.5, 1.0)
+]
+

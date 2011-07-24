@@ -1,0 +1,150 @@
+#extends "base.html"
+
+
+#block head
+# endblock
+
+#block main
+	<script>
+	function padDigits(d) {
+		if (d < 10) 
+			return '0' + d;
+		return d;
+	}
+	var options = 
+	{
+				grid: { hoverable: true, clickable: true, borderWidth: 0 },
+				legend: { show: false },
+				crosshair: { mode: 'x' },
+				selection: { mode: 'x' },
+				xaxis: { 
+					mode: 'time',
+					tickFormatter: function (s) { 
+
+						var d = new Date(s);
+						return padDigits(d.getHours()) + ':' + padDigits(d.getMinutes());
+					}
+				}, 
+				yaxis: { 
+					position: 'right',
+					min: 0,
+					labelWidth: 36,
+					tickFormatter: function (s) { return s.toFixed(2) + ' s' }
+				}
+	};
+	</script>
+
+	# for check in checks:
+		<div class="check {{ check.evaluate(pages.values(), validation_results)|lower }}">
+		<h3><a href="{{ '/probes'|url }}">{{ check.name }}</a></h3>
+		<div class="values">
+		<div class="value-max">{{ check.get_max_value(pages.values())|msformat }}</div>
+		<div class="value-avg">{{ check.get_avg_value(pages.values())|msformat }}</div>
+		<div class="value-min">{{ check.get_min_value(pages.values())|msformat }}</div>
+		</div>
+		<div class="chart" id="chart-{{ loop.index }}" style="height:160px;margin-right:200px"></div>
+		<script>
+			var p = $.plot($('#chart-{{ loop.index }}'), [{
+				label: 'time_total',
+				color: '#fff',
+				lines: { show: true, fill: true, lineWidth: 4 },
+				
+				data: [
+				# for ts, val in check.get_graph_data(pages.values()):
+					[{{'%d'|format(ts*1000)}}, {{val[4]}}, {{val[0]}}],
+				# endfor
+				]
+			}, {
+				label: 'time_dns',
+				color: '#fff',
+				lines: { show: true, fill: false, lineWidth: 2 },
+				shadowSize: 0,
+				data: [
+				# for ts, val in check.get_graph_data(pages.values()):
+					[{{'%d'|format(ts*1000)}}, {{val[0]}}],
+				# endfor
+				]
+			}, {
+				label: 'time_connect',
+				color: '#fff',
+				lines: { show: true, fill: false, lineWidth: 1 },
+				shadowSize: 0,
+				data: [
+				# for ts, val in check.get_graph_data(pages.values()):
+					[{{'%d'|format(ts*1000)}}, {{val[1]}}],
+				# endfor
+				]
+			}, {
+				label: 'time_request',
+				color: '#fff',
+				lines: { show: true, fill: false, lineWidth: 1 },
+				shadowSize: 0,
+				data: [
+				# for ts, val in check.get_graph_data(pages.values()):
+					[{{'%d'|format(ts*1000)}}, {{val[2]}}],
+				# endfor
+				]
+			}, {
+				label: 'time_response',
+				color: '#fff',
+				lines: { show: true, fill: true, lineWidth: 2 },
+				shadowSize: 0,
+				data: [
+				# for ts, val in check.get_graph_data(pages.values()):
+					[{{'%d'|format(ts*1000)}}, {{val[3]}}, {{val[1]}}],
+				# endfor
+				]
+			}], options);
+			$('#chart-{{ loop.index }}').data('plot', p);
+		</script>
+		</div>
+	# endfor
+	<script>
+	function showTooltip(x, y, contents) {
+        $('<div id="tooltip">' + contents + '</div>').css( {
+            position: 'absolute',
+            display: 'none',
+            top: y + 5,
+            left: x + 5,
+            border: '1px solid #999',
+            padding: '2px',
+            'background-color': '#eee',
+            opacity: 0.80
+        }).appendTo("body").fadeIn(200);
+    }
+	var previousPoint = null;
+    $(".chart").bind("plothover", function (event, pos, item) {
+ 
+            if (item) {
+                if (previousPoint != item.dataIndex) {
+                    previousPoint = item.dataIndex;
+                    
+                    $("#tooltip").remove();
+                    var x = item.datapoint[0],
+                        y = item.datapoint[1];
+                    
+					var d = new Date(x);
+                    showTooltip(item.pageX, item.pageY,
+                                item.series.label + " of " + d.toLocaleString() + " = " + Math.round(y*1000) + ' ms');
+                }
+            }
+            else {
+                $("#tooltip").remove();
+                previousPoint = null;            
+            }
+    });
+	$('.chart').bind("plotselected", function (event, ranges) {
+			var p = $(this).data('plot'); 
+            var plot = $.plot($(this), p.getData(),
+				  $.extend(true, {}, options, {
+					    xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+				  }));
+			$(this).data('plot', plot);
+    });
+ 
+	</script>
+
+#endblock
+
+#block footer
+#endblock

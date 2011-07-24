@@ -1,0 +1,38 @@
+
+<html>
+<head>
+<title>htmon</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link type="image/x-icon" href="{{app_url}}/static/favicon.ico"  rel="icon" />
+<link rel="stylesheet" href="{{app_url}}/static/css/base.css" />
+<script src="{{app_url}}/static/js/jquery-1.6.1.min.js"></script>
+<script src="{{app_url}}/static/js/jquery.flot.min.js"></script>
+<script src="{{app_url}}/static/js/jquery.flot.crosshair.min.js"></script>
+<script src="{{app_url}}/static/js/jquery.flot.selection.min.js"></script>
+
+#block head
+#endblock
+
+</head>
+<body>
+<div id="hdr">
+#block header
+#endblock    
+</div>
+#if flash_message:
+<div id="flash-message" class="{{ flash_message.type|e }}">
+    {{ flash_message.message|e }}
+</div>
+#endif
+<div id="main">
+#block main
+
+#endblock
+</div>
+<div id="ftr">
+#block footer
+#endblock
+</div>
+
+</body>
+</html>

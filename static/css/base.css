@@ -1,0 +1,197 @@
+body {
+    font: 13px Arial, Helvetica, sans-serif;
+    margin: 0;
+    background: #eee;
+}
+table {
+    background: #fff;
+    border: 1px solid #69c;
+}
+td, th, input, textarea {
+    font-size: 13px;
+}
+tr.odd td {
+    background: #f0f0f0;
+}
+a {
+    color: #0645ad;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    font-size: 18px;
+    margin: 18px 0;
+}
+h1 a {
+    color: #0645ad;
+    font-weight: normal;
+}
+h2 {
+    background: #000; color: #fff; padding: 8px 10px; font-size: 16px; font-weight: bold;
+    margin: 20px -10px 10px -10px;
+    text-transform: uppercase;
+    border-top: 2px solid #000;
+    border-bottom: 2px solid #000;
+}
+h2 a {
+    color: #99b7e8;
+    padding-right: 8px;
+}
+h2 a.selected {
+    color: #fff;
+}
+h3 {
+    font-size: 15px;
+    margin: 14px 0 7px 0;
+}
+h3 a {
+    font-weight: normal;
+}
+
+
+#hdr {
+	display: none;
+}
+
+#flash-message {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid;
+    padding: 15px 10px;
+    color: #00529B;
+    background-color: #BDE5F8;
+    font-weight: bold;
+}
+#flash-message.success {
+    color: #4F8A10;
+    background-color: #DFF2BF;
+}
+#flash-message.warning {
+    color: #9F6000;
+    background-color: #FEEFB3;
+}
+#flash-message.error {
+    color: #D8000C;
+    background-color: #FFBABA;
+}
+
+#main {
+    padding: 0 10px;
+}
+#main .textwarn {
+    margin: 10px 0;
+    padding: 5px;
+    border: 1px solid #9f6000;
+}
+#main .textwarn p {
+    color: #9f6000;
+    font-weight: bold;
+    margin: 5px; 
+}
+
+#main label {
+    float: left;
+    width: 200px;
+}
+#main label em {
+    display: block;
+    color: #666;
+    padding: 4px 8px 0 0;
+}
+#main input,
+#main textarea {
+    width: 600px;
+}
+#main textarea {
+    height: 150px;
+}
+#main .hint {
+    color: #999;
+}
+#main .buttons {
+    padding: 0 0 0 200px;
+}
+
+#ftr {
+    clear: both;
+    margin-top: 10px;
+    border-top: 1px solid #999;
+    background: #ccc;
+    font-size: 12px;
+    padding: 10px 10px 30px 10px;
+    color: #666;
+}
+#ftr ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+#ftr li {
+    margin: 0;
+    padding: 0 20px 0 0;
+    display: inline;
+}
+#ftr a {
+    color: #4d5f7e;
+}
+
+.check {
+	border: 3px solid #999;
+	margin: 8px 0;
+	padding: 8px;
+	position: relative;
+}
+.check h3 {
+	margin: 0;
+	position: absolute;
+	left: 8px;
+	top: 8px;
+	z-index: 999;
+	font-size: 42px;
+	font-weight: normal;
+	text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+.check h3 a {
+	color: #000;
+	font-weight: bold;
+}
+.check h3 a:hover {
+	text-decoration: none;
+	
+}
+.check.ok {
+	background: #a5ff70;
+	border-color: #009900;
+}
+.check.warning {
+	background: #ffee00;
+	border-color: #ee9900;
+}
+.check.critical {
+	background: #f84838;
+	border-color: #990000;
+}
+.check .values {
+	position: absolute;
+	right: 8px;
+	text-align: right;
+	top: 8px;
+	font-size: 42px;
+}
+tr.page-header td {
+	background: #000;
+	color: #fff;
+	font-weight: bold;
+}
+.yAxis .tickLabel {
+	text-align: right !important;
+}
+tr.warning td {
+	background: #ffff99;
+}
+tr.critical td {
+	background: #ff9999;
+}
