@@ -47,8 +47,11 @@ class Root(object):
 
     @expose
     @jinja(tpl='probes.html')
-    def probes(self):
-        return {'pages': pages, 'validation_results': validation_results}
+    def probes(self, check_id=None):
+        selected_probes = set()
+        if check_id:
+            selected_probes.update(config.checks[int(check_id)-1].get_matching_probes(pages.values()))
+        return {'pages': pages, 'validation_results': validation_results, 'selected_probes': selected_probes}
 
 
 class BackgroundPollerPlugin(cherrypy.process.plugins.Monitor):

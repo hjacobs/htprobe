@@ -12,6 +12,7 @@
         # for probe in page.probes[-1]:
             <tr class="{{loop.cycle('odd', 'even')}}
                 {{ validation_results[probe][0]|lower }}
+                {{ 'selected' if probe in selected_probes }}
             ">
                 <td>{{ probe.node|e }}</td>
                 <td>{{ probe.ts|timeformat }}</td>

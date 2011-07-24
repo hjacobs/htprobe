@@ -195,3 +195,6 @@ tr.warning td {
 tr.critical td {
 	background: #ff9999;
 }
+tr.selected td {
+	color: #009;
+}

@@ -36,7 +36,7 @@
 
 	# for check in checks:
 		<div class="check {{ check.evaluate(pages.values(), validation_results)|lower }}">
-		<h3><a href="{{ '/probes'|url }}">{{ check.name }}</a></h3>
+		<h3><a href="{{ '/probes/'|url }}{{ loop.index }}">{{ check.name }}</a></h3>
 		<div class="values">
 		<div class="value-max">{{ check.get_max_value(pages.values())|msformat }}</div>
 		<div class="value-avg">{{ check.get_avg_value(pages.values())|msformat }}</div>
