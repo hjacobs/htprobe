@@ -33,6 +33,11 @@ class Page(object):
         return min([ p[0].time_total for p in self.probes])
     def avg_time_total(self):
         return sum([ p[0].time_total for p in self.probes]) / len(self.probes)
+    def get_probes(self, minutes):
+        cutoff = time.time() - minutes*60
+        for p in self.probes:
+            if p[0].ts > cutoff:
+                yield p
 
 class Root(object):
     _cp_config = {

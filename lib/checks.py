@@ -2,10 +2,10 @@ import operator
 import re
 
 class AbstractCheck(object):
-    def get_matching_probes(self, pages):
+    def get_matching_probes(self, pages, minutes=60):
         data = []
         for p in pages:
-            for l in p.probes:
+            for l in p.get_probes(minutes):
                 for u in l:
                     if self.matches(p, u):
                         data.append(u)
@@ -23,11 +23,14 @@ class AbstractCheck(object):
             return 0
         return sum([ u.time_total for u in self.get_matching_probes(pages) ]) / len(self.get_matching_probes(pages))
     def get_graph_data(self, pages):
-        data = [ (u[1], u[4:9]) for u in self.get_matching_probes(pages) ]
+        data = [ (u[1], u[4:9]) for u in self.get_matching_probes(pages, minutes=500) ]
         return data
     def evaluate(self, pages, validation_results):
         status = 'OK'
-        for probe in self.get_matching_probes(pages):
+        probes = self.get_matching_probes(pages)
+        if not probes:
+            return 'UNKNOWN'
+        for probe in probes:
             res, msg = validation_results[probe]
             if res == 'CRITICAL':
                 return res

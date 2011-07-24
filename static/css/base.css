@@ -140,6 +140,7 @@ h3 a {
 
 .check {
 	border: 3px solid #999;
+	background: #cccccc;
 	margin: 8px 0;
 	padding: 8px;
 	position: relative;
