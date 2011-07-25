@@ -5,11 +5,17 @@ import os
 import socket
 import urlparse
 import re
+import socket
 import sys
 import tarfile
 import time
 import BeautifulSoup
 import urlparse
+from optparse import OptionParser
+
+timeout = 30
+user_agent = 'htprobe 0.1'
+
 
 class PageProbe(object):
     def __init__(self, url):
@@ -22,6 +28,13 @@ class ProbeResult(object):
         self.url = url
         self.original_url = original_url
         self.html = False
+        self.time_dns = 0
+        self.time_connect = 0
+        self.time_request = 0
+        self.time_response = 0
+        self.time_total = 0
+        self.status_code = 0
+        self.response_body = ''
 
 def url2path(url):
     pat = re.compile('[^a-z0-9._-]+')
@@ -71,17 +84,27 @@ def probe(url):
     r.addr = socket.gethostbyname(host)
     r.time_dns = time.time() - start
 
-    conn = httplib.HTTPConnection(r.addr, port=port, timeout=30)
-    conn.connect()
-    r.time_connect = time.time() - start
-    conn.request('GET', path, None, {'Host': host, 'User-Agent': 'htprobe 0.1'})
-    r.time_request = time.time() - start
-    resp = conn.getresponse()
-    r.status_code = resp.status
-    r.time_response = time.time() - start
-    r.response_body = resp.read()
-    r.time_total = time.time() - start
-    conn.close()
+    conn = httplib.HTTPConnection(r.addr, port=port, timeout=timeout)
+    try:
+        conn.connect()
+        r.time_connect = time.time() - start
+        conn.request('GET', path, None, {'Host': host, 'User-Agent': user_agent})
+        r.time_request = time.time() - start
+        resp = conn.getresponse()
+        r.status_code = resp.status
+        r.time_response = time.time() - start
+        r.response_body = resp.read()
+        r.time_total = time.time() - start
+        conn.close()
+    except socket.timeout, e:
+        r.status_code = 901
+        last = r.time_dns
+        for a in ('time_connect', 'time_request', 'time_response'):
+            v = getattr(r, a)
+            if not v:
+                setattr(r, a, last)
+            last = v
+        r.time_total = time.time() - start    
     return r
 
 
@@ -145,11 +168,25 @@ def probe_page(url):
         #print url
     return p
 
-p = probe_page(sys.argv[1])
-path = sys.argv[2]
+parser = OptionParser(usage='usage: %prog [options] <URL> <RESULT_PATH>')
+parser.add_option('-q', '--quiet', action='store_true', dest='quiet', help='silent mode: do not print informational messages')
+parser.add_option('-u', '--user-agent', dest='user_agent', default=user_agent, help='use custom user agent HTTP header')
+parser.add_option('-t', '--timeout', dest='timeout', default=timeout, help='socket timeout in seconds')
+(options, args) = parser.parse_args()
+
+if len(args) != 2:
+    parser.error('incorrect number of arguments')
+
+timeout = float(options.timeout)
+user_agent = options.user_agent
+
+p = probe_page(args[0])
+path = args[1]
 
 dump_probe(p, path)
 
-print 'Probed {0} urls in {1:.2} seconds with {2} Bytes total size'.format(len(p.probes),
-    sum([ r.time_total for r in p.probes ]),
-    sum([ len(r.response_body) for r in p.probes ]))
+if not options.quiet:
+    print 'Probed {0} urls in {1:.2} seconds with {2} Bytes total size'.format(len(p.probes),
+        sum([ r.time_total for r in p.probes ]),
+        sum([ len(r.response_body) for r in p.probes ]))
+
