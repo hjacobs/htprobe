@@ -39,7 +39,7 @@ class AbstractCheck(object):
         return sum([ u.time_total for u in self.get_matching_probes(pages) ]) / len(self.get_matching_probes(pages))
     def get_graph_data(self, pages):
         data = [ (u[1], u[4:9]) for u in self.get_matching_probes(pages, minutes=500) ]
-        return average_by_time(data)
+        return average_by_time(sorted(data))
     def evaluate(self, pages, validation_results):
         status = 'OK'
         probes = self.get_matching_probes(pages)

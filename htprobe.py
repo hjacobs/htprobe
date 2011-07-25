@@ -71,7 +71,7 @@ def probe(url):
     r.addr = socket.gethostbyname(host)
     r.time_dns = time.time() - start
 
-    conn = httplib.HTTPConnection(r.addr, port=port)
+    conn = httplib.HTTPConnection(r.addr, port=port, timeout=30)
     conn.connect()
     r.time_connect = time.time() - start
     conn.request('GET', path, None, {'Host': host, 'User-Agent': 'htprobe 0.1'})
