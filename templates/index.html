@@ -11,6 +11,11 @@
 			return '0' + d;
 		return d;
 	}
+    function toggleShowProbesInError(idx) {
+        var table = $('#table-probes-' + idx);
+        table.toggle();
+        return false;
+    }
 	var options = 
 	{
 				grid: { hoverable: true, clickable: true, borderWidth: 0 },
@@ -97,6 +102,29 @@
 			}], options);
 			$('#chart-{{ loop.index }}').data('plot', p);
 		</script>
+        # set validation_errors = check.get_validation_errors(pages.values(), validation_results)
+        # if validation_errors:
+            <a href="javascript:toggleShowProbesInError({{loop.index}})">toggle show probes in error</a>
+            <table style="display:none" id="table-probes-{{ loop.index }}">
+            <tr><th>Node</th><th>Time</th><th>Url</th><th>Status</th><th>DNS</th><th>Connect</th><th>Request</th><th>Response</th><th>Total</th><th>Size</th></tr>
+            # for probe, res, msg in validation_errors:
+                    <tr class="{{loop.cycle('odd', 'even')}}
+                        {{ res|lower }}
+                    " title="{{ msg|e }}">
+                        <td>{{ probe.node|e }}</td>
+                        <td>{{ probe.ts|timeformat }}</td>
+                        <td>{{ probe.url|truncate(100, killwords=True)|e }}</td>
+                        <td align="center">{{ probe.status_code }}</td>
+                        <td align="right">{{ probe.time_dns|msformat }}</td>
+                        <td align="right">{{ probe.time_connect|msformat }}</td>
+                        <td align="right">{{ probe.time_request|msformat }}</td>
+                        <td align="right">{{ probe.time_response|msformat }}</td>
+                        <td align="right">{{ probe.time_total|msformat }}</td>
+                        <td align="right">{{ probe.response_body_length }} B</td>
+                    </tr>
+            # endfor
+            </table>
+        # endif
 		</div>
 	# endfor
 	<script>

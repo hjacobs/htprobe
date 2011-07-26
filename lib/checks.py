@@ -40,6 +40,14 @@ class AbstractCheck(object):
     def get_graph_data(self, pages):
         data = [ (u[1], u[4:9]) for u in self.get_matching_probes(pages, minutes=500) ]
         return average_by_time(sorted(data))
+    def get_validation_errors(self, pages, validation_results):
+        probes = self.get_matching_probes(pages)
+        errors = []
+        for probe in probes:
+            res, msg = validation_results[probe]
+            if res != 'OK':
+                errors.append((probe, res, msg))
+        return errors
     def evaluate(self, pages, validation_results):
         status = 'OK'
         probes = self.get_matching_probes(pages)

@@ -182,6 +182,9 @@ h3 a {
 	top: 8px;
 	font-size: 42px;
 }
+.check a {
+    color: #999;
+}
 tr.page-header td {
 	background: #000;
 	color: #fff;
@@ -198,4 +201,9 @@ tr.critical td {
 }
 tr.selected td {
 	color: #009;
+}
+.check table {
+    width: 100%;
+    border: 1px solid #999;
+    margin-top: 8px;
 }
