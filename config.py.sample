@@ -3,7 +3,7 @@ from lib.checks import PageCheck, UrlCheck
 from lib.validators import ValidateStatusCode, ValidateTimeTotal
         
 checks = [
-    PageCheck('Home', '.*example[^/]*/$'),
+    PageCheck('Home', '.*srcco\.de/$'),
     PageCheck('Page1', '.*example[^/]*/page1/$'),
     UrlCheck('Images', 'jpg$'),
 ]
