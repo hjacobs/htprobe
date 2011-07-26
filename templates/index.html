@@ -104,7 +104,7 @@
 		</script>
         # set validation_errors = check.get_validation_errors(pages.values(), validation_results)
         # if validation_errors:
-            <a href="javascript:toggleShowProbesInError({{loop.index}})">toggle show probes in error</a>
+            <a href="javascript:void(toggleShowProbesInError({{loop.index}}))">toggle show probes in error</a>
             <table style="display:none" id="table-probes-{{ loop.index }}">
             <tr><th>Node</th><th>Time</th><th>Url</th><th>Status</th><th>DNS</th><th>Connect</th><th>Request</th><th>Response</th><th>Total</th><th>Size</th></tr>
             # for probe, res, msg in validation_errors:
