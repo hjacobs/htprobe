@@ -183,7 +183,7 @@ h3 a {
 	font-size: 42px;
 }
 .check a {
-    color: #999;
+    color: rgba(0,0,0,0.7);
 }
 tr.page-header td {
 	background: #000;
