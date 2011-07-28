@@ -16,6 +16,7 @@ from optparse import OptionParser
 timeout = 30
 user_agent = 'htprobe 0.1'
 
+debug_log = []
 
 class PageProbe(object):
     def __init__(self, url):
@@ -58,6 +59,10 @@ def dump_probe(probe, path):
                 r.time_dns, r.time_connect, r.time_request, r.time_response, r.time_total,
                 len(r.response_body)))))
             fd.write('\n')
+    with open(os.path.join(path, 'debug.log'), 'wb') as fd:
+        for line in debug_log:
+            fd.write(line)
+            fd.write('\n')
     assets = os.path.join(path, 'assets')
     os.mkdir(assets)
     for r in probe.probes:
@@ -77,20 +82,28 @@ def probe(url):
     try:
         port = int(port)
     except ValueError:
-        port = None
+        if scheme == 'https':
+            port = 443
+        else:
+            port = 80
     path = '/' + path
 
     start = time.time()
     r.addr = socket.gethostbyname(host)
     r.time_dns = time.time() - start
 
+    debug_log.append('Connecting to {0}|{1}|{2}'.format(host, r.addr, port))
     conn = httplib.HTTPConnection(r.addr, port=port, timeout=timeout)
     try:
         conn.connect()
         r.time_connect = time.time() - start
+        debug_log.append('GET {0}'.format(path))
         conn.request('GET', path, None, {'Host': host, 'User-Agent': user_agent})
         r.time_request = time.time() - start
         resp = conn.getresponse()
+        debug_log.append('  {0} {1}'.format(resp.status, resp.reason))
+        for key, val in sorted(resp.getheaders()):
+            debug_log.append('  {0}: {1}'.format(key.capitalize(), val))
         r.status_code = resp.status
         r.time_response = time.time() - start
         r.response_body = resp.read()
