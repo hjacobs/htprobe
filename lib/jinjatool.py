@@ -109,6 +109,10 @@ def msformat(d):
     return '%d ms' % (d * 1000,)
 
 @loader.add_filter
+def dtformat(d):
+    return d.strftime('%Y-%m-%d %H:%M')
+
+@loader.add_filter
 def timeformat(ts):
     return time.strftime('%H:%M:%S', time.localtime(ts))
 

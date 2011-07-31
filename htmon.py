@@ -2,6 +2,7 @@
 
 import cherrypy
 import collections
+import datetime
 import itertools
 import logging
 import logging.config
@@ -10,6 +11,7 @@ import sys
 import time
 import urlparse
 import lib.jinjatool
+from lib.dateparse import parse_date
 import config
 
 logging.basicConfig()
@@ -20,9 +22,9 @@ jinja = cherrypy.tools.jinja
 
 
 class Page(object):
-    def __init__(self, url):
+    def __init__(self, url, maxhistory=100):
         self.url = url
-        self.probes = collections.deque(maxlen=100)
+        self.probes = collections.deque(maxlen=maxhistory)
     def add_probe(self, probe):
         self.probes.append(probe)
     def http_errors(self):
@@ -57,6 +59,23 @@ class Root(object):
         if check_id:
             selected_probes.update(config.checks[int(check_id)-1].get_matching_probes(pages.values()))
         return {'pages': pages, 'validation_results': validation_results, 'selected_probes': selected_probes}
+
+    @expose
+    @jinja(tpl='probes_in_error.html')
+    def probes_in_error(self, time_from='-4h', time_to='now'):
+        time_from = parse_date(time_from)
+        time_to = parse_date(time_to)
+        _pages = read_probes(path, time_from, time_to)
+        probes = []
+        for page in _pages.values():
+            for _p in page.probes:
+                probes += _p
+        errors = []
+        for probe in probes:
+            res, msg = validation_results[probe]
+            if res != 'OK':
+                errors.append((probe, res, msg))
+        return {'probes_in_error': errors, 'time_from': time_from, 'time_to': time_to}
 
 
 class BackgroundPollerPlugin(cherrypy.process.plugins.Monitor):
@@ -98,9 +117,7 @@ class BackgroundPollerPlugin(cherrypy.process.plugins.Monitor):
 
 ProbePerfData = collections.namedtuple('ProbePerfData', 'node ts url status_code time_dns time_connect time_request time_response time_total response_body_length')
 
-path = sys.argv[1]
 
-nodes = sorted(os.listdir(path))
 pages = {}
 validation_results = {}
 
@@ -127,24 +144,40 @@ def read_perfdata(node_dir, probe):
             perfdata.append(p)
     return perfdata
 
-for node in nodes:
-    node_dir = os.path.join(path, node)
-    probes = sorted(os.listdir(node_dir))
+def filter_probes(probes, time_from, time_to):
     for probe in probes:
-        perfdata = read_perfdata(node_dir, probe)
-        page = pages.get(perfdata[0].url)
-        if not page:
-            page = Page(perfdata[0].url)
-            pages[page.url] = page
-        page.add_probe(perfdata)
-        
-conf = os.path.dirname(os.path.abspath(__file__)) + '/site.conf'
-cherrypy.config.update(conf)
+        d = datetime.datetime.strptime(probe[:14], '%Y%m%d%H%M%S')
+        if d >= time_from and d < time_to:
+            yield probe
 
-app = cherrypy.tree.mount(Root(), '', conf) 
-poller_plugin = BackgroundPollerPlugin(cherrypy.engine, frequency=app.config['poller']['frequency'])
-poller_plugin.subscribe()
-cherrypy.engine.start()
-cherrypy.engine.block()
+def read_probes(path, time_from, time_to):
+    nodes = sorted(os.listdir(path))
+    pages = {}
+    for node in nodes:
+        node_dir = os.path.join(path, node)
+        probes = sorted(filter_probes(os.listdir(node_dir), time_from, time_to))
+        for probe in probes:
+            perfdata = read_perfdata(node_dir, probe)
+            page = pages.get(perfdata[0].url)
+            if not page:
+                page = Page(perfdata[0].url)
+                pages[page.url] = page
+            page.add_probe(perfdata)
+    return pages
+        
+if __name__ == '__main__':
+    path = sys.argv[1]
+    td = datetime.timedelta(days=7)
+    now = datetime.datetime.now()
+    _pages = read_probes(path, now - td, now)
+    pages.update(_pages)
+    conf = os.path.dirname(os.path.abspath(__file__)) + '/site.conf'
+    cherrypy.config.update(conf)
+
+    app = cherrypy.tree.mount(Root(), '', conf) 
+    poller_plugin = BackgroundPollerPlugin(cherrypy.engine, frequency=app.config['poller']['frequency'])
+    poller_plugin.subscribe()
+    cherrypy.engine.start()
+    cherrypy.engine.block()
 
 

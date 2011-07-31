@@ -1,0 +1,40 @@
+#extends "base.html"
+
+
+#block head
+# endblock
+
+#block main
+
+<h1>Probes in error</h1>
+
+<form action="?">
+<input name="time_from" value="{{ time_from|dtformat }}" /> -
+<input name="time_to" value="{{ time_to|dtformat }}" />
+<button type="submit">Update</button>
+</form>
+    <table>
+    <tr><th>Node</th><th>Time</th><th>Url</th><th>Status</th><th>DNS</th><th>Connect</th><th>Request</th><th>Response</th><th>Total</th><th>Size</th></tr>
+    # for probe, res, msg in probes_in_error:
+            <tr class="{{loop.cycle('odd', 'even')}}
+                {{ res|lower }}
+                {{ 'selected' if probe in selected_probes }}
+            ">
+                <td>{{ probe.node|e }}</td>
+                <td>{{ probe.ts|timeformat }}</td>
+                <td>{{ probe.url|truncate(100, killwords=True)|e }}</td>
+                <td>{{ probe.status_code }}</td>
+                <td align="right">{{ probe.time_dns|msformat }}</td>
+                <td align="right">{{ probe.time_connect|msformat }}</td>
+                <td align="right">{{ probe.time_request|msformat }}</td>
+                <td align="right">{{ probe.time_response|msformat }}</td>
+                <td align="right">{{ probe.time_total|msformat }}</td>
+                <td align="right">{{ probe.response_body_length }}</td>
+            </tr>
+    # endfor
+    </table>
+
+#endblock
+
+#block footer
+#endblock
