@@ -89,7 +89,22 @@ def probe(url):
     path = '/' + path
 
     start = time.time()
-    r.addr = socket.gethostbyname(host)
+    try:
+        r.addr = socket.gethostbyname(host)
+    except socket.gaierror, e:
+        debug_log.append('Failed to resolve DNS for {0}'.format(host))
+        debug_log.append('  socket.gaierror: {0}'.format(e))
+        r.status_code = 903
+        r.time_dns = time.time() - start
+        last = r.time_dns
+        for a in ('time_connect', 'time_request', 'time_response'):
+            v = getattr(r, a)
+            if not v:
+                setattr(r, a, last)
+            last = v
+        r.time_total = time.time() - start    
+        return r
+
     r.time_dns = time.time() - start
 
     debug_log.append('Connecting to {0}|{1}|{2}'.format(host, r.addr, port))
@@ -110,7 +125,18 @@ def probe(url):
         r.time_total = time.time() - start
         conn.close()
     except socket.timeout, e:
+        debug_log.append('  socket.timeout: {0}'.format(e))
         r.status_code = 901
+        last = r.time_dns
+        for a in ('time_connect', 'time_request', 'time_response'):
+            v = getattr(r, a)
+            if not v:
+                setattr(r, a, last)
+            last = v
+        r.time_total = time.time() - start    
+    except socket.error, e:
+        debug_log.append('  socket.error: {0}'.format(e))
+        r.status_code = 902
         last = r.time_dns
         for a in ('time_connect', 'time_request', 'time_response'):
             v = getattr(r, a)
