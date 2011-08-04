@@ -167,7 +167,7 @@ def read_probes(path, time_from, time_to):
         
 if __name__ == '__main__':
     path = sys.argv[1]
-    td = datetime.timedelta(days=7)
+    td = datetime.timedelta(days=1)
     now = datetime.datetime.now()
     _pages = read_probes(path, now - td, now)
     pages.update(_pages)
