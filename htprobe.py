@@ -6,8 +6,6 @@ import socket
 import urlparse
 import re
 import socket
-import sys
-import tarfile
 import time
 import BeautifulSoup
 import urlparse
@@ -69,10 +67,12 @@ def dump_probe(probe, path):
         with open(os.path.join(assets, url2path(r.url)), 'wb') as fd:
             fd.write(r.response_body)
         if r.html:
-            rewritten_body = rewrite_urls(r.response_body.decode('utf-8'), probe.probes)
-            with open(os.path.join(assets, url2path(r.url) + '.rewritten.html'), 'wb') as fd:
-                fd.write(rewritten_body.encode('utf-8'))
-        
+            try: 
+                rewritten_body = rewrite_urls(r.response_body.decode('utf-8'), probe.probes)
+                with open(os.path.join(assets, url2path(r.url) + '.rewritten.html'), 'wb') as fd:
+                    fd.write(rewritten_body.encode('utf-8'))
+            except UnicodeDecodeError, e:
+                debug_log.append('HTML response of {0} not UTF-8 encoded: {1}'.format(r.url, e))
     
 
 def probe(url):
