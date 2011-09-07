@@ -115,7 +115,12 @@ class BackgroundPollerPlugin(cherrypy.process.plugins.Monitor):
         except:
             self.bus.log('Exception while polling for new probes', traceback=True)
 
-ProbePerfData = collections.namedtuple('ProbePerfData', 'node ts url status_code time_dns time_connect time_request time_response time_total response_body_length')
+class ProbePerfData(collections.namedtuple('ProbePerfData', 'node ts url status_code time_dns time_connect time_request time_response time_total response_body_length')):
+    def get_transfer_rate(self):
+        """return transfer rate in bits per second"""
+        # time_* are in seconds
+        # response_body_length is in Bytes
+        return 8 * self.response_body_length / (0.001 + self.time_total - self.time_response)
 
 
 pages = {}

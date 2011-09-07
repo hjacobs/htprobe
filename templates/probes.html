@@ -6,9 +6,9 @@
 
 #block main
     <table>
-    <tr><th>Node</th><th>Time</th><th>Url</th><th>Status</th><th>DNS</th><th>Connect</th><th>Request</th><th>Response</th><th>Total</th><th>Size</th></tr>
+    <tr><th>Node</th><th>Time</th><th>Url</th><th>Status</th><th>DNS</th><th>Connect</th><th>Request</th><th>Response</th><th>Total (incl. dl)</th><th>Size</th><th>Transfer Rate</th></tr>
     # for page in pages.values():
-        <tr class="page-header"><td colspan="10">{{ page.url|e }}</td></tr>
+        <tr class="page-header"><td colspan="11">{{ page.url|e }}</td></tr>
         # for probe in page.probes[-1]:
             <tr class="{{loop.cycle('odd', 'even')}}
                 {{ validation_results[probe][0]|lower }}
@@ -23,7 +23,8 @@
                 <td align="right">{{ probe.time_request|msformat }}</td>
                 <td align="right">{{ probe.time_response|msformat }}</td>
                 <td align="right">{{ probe.time_total|msformat }}</td>
-                <td align="right">{{ probe.response_body_length }}</td>
+                <td align="right">{{ probe.response_body_length|bytesizeformat }}</td>
+                <td align="right">{{ probe.get_transfer_rate()|bitrateformat }}</td>
             </tr>
         # endfor
     # endfor

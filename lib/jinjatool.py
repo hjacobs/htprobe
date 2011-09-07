@@ -116,3 +116,20 @@ def dtformat(d):
 def timeformat(ts):
     return time.strftime('%H:%M:%S', time.localtime(ts))
 
+@loader.add_filter
+def bytesizeformat(s):
+    if s >= 1000000:
+        return '{0:.1f} MB'.format(s * 1.0 / 1000000)
+    elif s >= 1000:
+        return '{0:.1f} kB'.format(s * 1.0 / 1000)
+    return '{0} B'.format(s)
+        
+@loader.add_filter
+def bitrateformat(s):
+    if s >= 1000000:
+        return '{0:.1f} Mbit/s'.format(s * 1.0 / 1000000)
+    elif s >= 1000:
+        return '{0:.1f} kbit/s'.format(s * 1.0 / 1000)
+    return '{0:.0f} bit/s'.format(s)
+        
+
