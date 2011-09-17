@@ -77,6 +77,17 @@ class Root(object):
                 errors.append((probe, res, msg))
         return {'probes_in_error': errors, 'time_from': time_from, 'time_to': time_to}
 
+    @expose
+    @jinja(tpl='probe_details.html')
+    def probe_details(self, node, probe):
+        node_dir = os.path.join(path, node)
+        perfdata = read_perfdata(node_dir, probe)
+        logfile = os.path.join(node_dir, probe, 'debug.log')
+        debug_log = ''
+        with open(logfile, 'rb') as fd:
+            debug_log = fd.read()
+        return {'perfdata': perfdata, 'debug_log': debug_log, 'validation_results': validation_results}
+
 
 class BackgroundPollerPlugin(cherrypy.process.plugins.Monitor):
     def __init__(self, bus, frequency=5):
@@ -115,7 +126,7 @@ class BackgroundPollerPlugin(cherrypy.process.plugins.Monitor):
         except:
             self.bus.log('Exception while polling for new probes', traceback=True)
 
-class ProbePerfData(collections.namedtuple('ProbePerfData', 'node ts url status_code time_dns time_connect time_request time_response time_total response_body_length')):
+class ProbePerfData(collections.namedtuple('ProbePerfData', 'node probe ts url status_code time_dns time_connect time_request time_response time_total response_body_length')):
     def get_transfer_rate(self):
         """return transfer rate in bits per second"""
         # time_* are in seconds
@@ -142,7 +153,7 @@ def read_perfdata(node_dir, probe):
     with open(perffile) as fd:
         for line in fd:
             cols = line.rstrip().split('\t')
-            cols = [node, ts + tsum, cols[0], int(cols[1])] + map(float, cols[2:-1]) + [int(cols[-1])]
+            cols = [node, probe, ts + tsum, cols[0], int(cols[1])] + map(float, cols[2:-1]) + [int(cols[-1])]
             p = ProbePerfData._make(cols)
             tsum += p.time_total
             validation_results[p] = validate_probe(p)

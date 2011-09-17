@@ -111,7 +111,7 @@
                     <tr class="{{loop.cycle('odd', 'even')}}
                         {{ res|lower }}
                     " title="{{ msg|e }}">
-                        <td>{{ probe.node|e }}</td>
+                        <td><a href="{{ ['probe_details', probe.node, probe.probe]|url }}">{{ probe.node|e }}</a></td>
                         <td>{{ probe.ts|timeformat }}</td>
                         <td>{{ probe.url|truncate(100, killwords=True)|e }}</td>
                         <td align="center">{{ probe.status_code }}</td>
