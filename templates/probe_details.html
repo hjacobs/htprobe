@@ -1,0 +1,36 @@
+#extends "base.html"
+
+
+#block head
+# endblock
+
+#block main
+    <table>
+    <tr><th>Node</th><th>Time</th><th>Url</th><th>Status</th><th>DNS</th><th>Connect</th><th>Request</th><th>Response</th><th>Total (incl. dl)</th><th>Size</th><th>Transfer Rate</th></tr>
+        <tr class="page-header"><td colspan="11"></td></tr>
+        # for probe in perfdata:
+            <tr class="{{loop.cycle('odd', 'even')}}
+                {{ validation_results[probe][0]|lower }}
+                {{ 'selected' if probe in selected_probes }}
+            ">
+                <td>{{ probe.node|e }}</td>
+                <td>{{ probe.ts|timeformat }}</td>
+                <td>{{ probe.url|truncate(100, killwords=True)|e }}</td>
+                <td>{{ probe.status_code }}</td>
+                <td align="right">{{ probe.time_dns|msformat }}</td>
+                <td align="right">{{ probe.time_connect|msformat }}</td>
+                <td align="right">{{ probe.time_request|msformat }}</td>
+                <td align="right">{{ probe.time_response|msformat }}</td>
+                <td align="right">{{ probe.time_total|msformat }}</td>
+                <td align="right">{{ probe.response_body_length|bytesizeformat }}</td>
+                <td align="right">{{ probe.get_transfer_rate()|bitrateformat }}</td>
+            </tr>
+        # endfor
+    </table>
+
+    <pre class="debug-log">{{ debug_log }}</pre>
+
+#endblock
+
+#block footer
+#endblock
