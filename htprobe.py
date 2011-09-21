@@ -124,7 +124,7 @@ def probe(url):
         conn.request('GET', path, None, {'Host': host, 'User-Agent': user_agent})
         r.time_request = time.time() - start
         resp = conn.getresponse()
-        log('  {0} {1}'.format(resp.status, resp.reason))
+        log('{0} {1}'.format(resp.status, resp.reason))
         for key, val in sorted(resp.getheaders()):
             log('  {0}: {1}'.format(key.capitalize(), val))
         r.status_code = resp.status
@@ -153,6 +153,7 @@ def probe(url):
                 setattr(r, a, last)
             last = v
         r.time_total = time.time() - start    
+    log('  ' + '--' * 20)
     return r
 
 
